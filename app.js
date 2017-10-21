@@ -23,16 +23,16 @@ app.use(passport.session());
 require('./auth');
 
 app.get('/', routes.site.index);
-app.get('/login', routes.site.loginForm);
-app.post('/login', routes.site.login);
-app.get('/logout', routes.site.logout);
-app.get('/account', routes.site.account);
+app.get('/oauth/login', routes.site.loginForm);
+app.post('/oauth/login', routes.site.login);
+app.get('/oauth/logout', routes.site.logout);
+app.get('/oauth/account', routes.site.account);
 
-app.get('/dialog/authorize', routes.oauth2.authorization);
-app.post('/dialog/authorize/decision', routes.oauth2.decision);
-app.post('/oauth/token', routes.oauth2.token);
+app.get('/oauth/dialog/authorize', routes.oauth2.authorization);
+app.post('/oauth/dialog/authorize/decision', routes.oauth2.decision);
+app.all('/oauth/oauth/token', routes.oauth2.token);
 
-app.get('/api/userinfo', routes.user.info);
-app.get('/api/clientinfo', routes.client.info);
+app.get('/oauth/api/userinfo', routes.user.info);
+app.get('/oauth/api/clientinfo', routes.client.info);
 
 app.listen(process.env.PORT || 3000);

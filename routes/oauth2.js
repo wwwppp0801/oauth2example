@@ -74,6 +74,7 @@ server.grant(oauth2orize.grant.token((client, user, ares, done) => {
 // code.
 
 server.exchange(oauth2orize.exchange.code((client, code, redirectUri, done) => {
+  console.log(client,code,redirectUri);
   db.authorizationCodes.find(code, (error, authCode) => {
     if (error) return done(error);
     if (client.id !== authCode.clientId) return done(null, false);
@@ -151,7 +152,7 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
 // first, and rendering the `dialog` view.
 
 module.exports.authorization = [
-  login.ensureLoggedIn(),
+  login.ensureLoggedIn("/oauth/login"),
   server.authorization((clientId, redirectUri, done) => {
     db.clients.findByClientId(clientId, (error, client) => {
       if (error) return done(error);
@@ -188,7 +189,7 @@ module.exports.authorization = [
 // a response.
 
 exports.decision = [
-  login.ensureLoggedIn(),
+  login.ensureLoggedIn("/oauth/login"),
   server.decision(),
 ];
 
@@ -201,6 +202,16 @@ exports.decision = [
 // authenticate when making requests to this endpoint.
 
 exports.token = [
+    (request, response,next) => {
+        console.log(request.query,request.body);
+        if(request.query.code){
+            if(!request.body){
+                request.body={};
+            }
+            request.body=Object.assign(request.body,request.query);
+        }
+        next();
+    },
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   server.token(),
   server.errorHandler(),
